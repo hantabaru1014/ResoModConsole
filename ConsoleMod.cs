@@ -14,12 +14,12 @@ namespace Console
     {
         public override string Name => "Console";
         public override string Author => "Kannya";
-        public override string Version => "1.0.1";
+        public override string Version => "1.1.0";
         
         public override string Link => "https://github.com/KannyaResonite/Console/";
         
         [AutoRegisterConfigKey]
-        private static ModConfigurationKey<bool> LogToFile = new ModConfigurationKey<bool>("Log To File", "Whether console should forward the logged data into a txt file.", () => true);
+        private static ModConfigurationKey<bool> LogToFile = new ModConfigurationKey<bool>("Log To File", "Whether console should forward the logged data into a txt file.", () => false);
         
         // allocconsole
         [DllImport("kernel32.dll")]
@@ -43,7 +43,7 @@ namespace Console
                 var writer = new StreamWriter(System.Console.OpenStandardOutput()) { AutoFlush = true };
                 System.Console.SetOut(writer);
 
-                System.Console.Title = "Resonite | Kannya's Console";
+                System.Console.Title = "Resonite | Mod Console";
                 
                 // reflection to get a internal sealed class, i hate it
                 try
@@ -139,15 +139,14 @@ namespace Console
 
         public static void LogToConsole(string text)
         {
-            text = $"[{DateTime.Now:dd/MM/yyyy hh:mm:ss tt}] {text}"; // UK date layout as i'm from scotland, deal with it :)
+            text = $"[{DateTime.Now:HH:mm:ss}] {text}";
             
             System.Console.WriteLine(text);
 
             if (Config.GetValue(LogToFile))
             {
-                Directory.CreateDirectory($"{Environment.CurrentDirectory}\\rml_logs");
-                
-                File.AppendAllText($"{Environment.CurrentDirectory}\\rml_logs\\RML_{StartDate:dd-MM-yyyy hh-mm-ss tt}.txt", text + "\r\n");
+                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "rml_logs"));
+                File.AppendAllText(Path.Combine(Environment.CurrentDirectory, "rml_logs", $"RML_{StartDate:yyyy-MM-dd HH_mm_ss}.log"), text + "\n");
             }
         }
 
